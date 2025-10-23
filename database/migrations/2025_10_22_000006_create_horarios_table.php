@@ -8,7 +8,7 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::create('Horarios', function (Blueprint $table) {
-            $table->integer('ID')->primary();
+            $table->bigIncrements('ID');
             $table->time('Hora_Inicio');
             $table->time('Hora_Fin');
         });

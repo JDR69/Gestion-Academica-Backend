@@ -8,7 +8,7 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::create('Docente', function (Blueprint $table) {
-            $table->integer('ID')->primary();
+            $table->bigIncrements('ID');
             $table->string('Nombre', 50);
             $table->string('Apellido', 50);
             $table->integer('Registro');

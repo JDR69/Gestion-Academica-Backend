@@ -8,7 +8,7 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::create('Grupos', function (Blueprint $table) {
-            $table->integer('ID')->primary();
+            $table->bigIncrements('ID');
             $table->string('Nombre', 100);
         });
     }
