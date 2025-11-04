@@ -24,3 +24,6 @@ Route::apiResource('asistencia', AsistenciaController::class);
 
 // Auth
 Route::post('login', [AuthController::class, 'login']);
+
+// Horarios por Docente
+Route::get('docente/{id}/horarios', [DocenteController::class, 'horarios']);
