@@ -43,6 +43,36 @@ class DetalleHorarioController extends Controller
         return response()->json($detalle);
     }
 
+    // Marcar asistencia de un docente para una materia/horario
+    public function marcarAsistencia(Request $request)
+    {
+        $request->validate([
+            'ID_Docente' => 'required|integer|exists:Docente,ID',
+            'ID_Detalle_Horario' => 'required|integer|exists:Detalle_Horario,ID',
+            'ID_Asistencia' => 'required|integer|exists:Asistencia,ID',
+        ]);
+
+        // Buscar si ya existe el registro para ese docente y ese detalle de horario
+        $detalle = \App\Models\DetalleDocente::where('ID_Docente', $request->ID_Docente)
+            ->where('ID_Detalle_Horario', $request->ID_Detalle_Horario)
+            ->first();
+
+        if ($detalle) {
+            // Si existe, actualiza la asistencia
+            $detalle->ID_Asistencia = $request->ID_Asistencia;
+            $detalle->save();
+        } else {
+            // Si no existe, crea el registro
+            $detalle = \App\Models\DetalleDocente::create([
+                'ID_Docente' => $request->ID_Docente,
+                'ID_Detalle_Horario' => $request->ID_Detalle_Horario,
+                'ID_Asistencia' => $request->ID_Asistencia,
+            ]);
+        }
+
+        return response()->json($detalle, 201);
+    }
+
     public function destroy($id)
     {
         $detalle = DetalleHorario::findOrFail($id);

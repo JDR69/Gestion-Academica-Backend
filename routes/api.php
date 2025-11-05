@@ -12,6 +12,7 @@ use App\Http\Controllers\DetalleDocenteController;
 use App\Http\Controllers\DocenteController;
 use App\Http\Controllers\AsistenciaController;
 use App\Http\Controllers\AuthController;
+// Marcar asistencia de un docente para una materia/horario
 
 Route::apiResource('materia', MateriaController::class);
 Route::apiResource('grupos', GruposController::class);
@@ -24,3 +25,7 @@ Route::apiResource('asistencia', AsistenciaController::class);
 
 // Auth
 Route::post('login', [AuthController::class, 'login']);
+
+// Horarios por Docente
+Route::get('docente/{id}/horarios', [DocenteController::class, 'horarios']);
+Route::post('detalle-horario/marcar-asistencia', [App\Http\Controllers\DetalleHorarioController::class, 'marcarAsistencia']);

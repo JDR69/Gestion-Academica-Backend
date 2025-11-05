@@ -18,6 +18,14 @@ class DatabaseSeeder extends Seeder
         // $this->call([]);
         $this->call([
             AdminSeeder::class,
+            DocenteSeeder::class,
+            AsistenciaSeeder::class,
+            MateriaSeeder::class,
+            GruposSeeder::class,
+            AulaSeeder::class,
+            HorariosSeeder::class,
+            DetalleHorarioSeeder::class,
+            DetalleDocenteSeeder::class,
         ]);
     }
 }

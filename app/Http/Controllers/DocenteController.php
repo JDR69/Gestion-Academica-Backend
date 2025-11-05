@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Docente;
+use App\Models\DetalleDocente;
 use Illuminate\Http\Request;
 
 class DocenteController extends Controller
@@ -56,5 +57,47 @@ class DocenteController extends Controller
         $docente = Docente::findOrFail($id);
         $docente->delete();
         return response()->json(null, 204);
+    }
+
+    /**
+     * Retorna los horarios asignados al docente (Detalla Materia, Grupo, Aula y Horario).
+     */
+    public function horarios($id)
+    {
+        $docente = Docente::findOrFail($id);
+
+        // Traer los Detalle_Docente con el Detalle_Horario y sus relaciones
+        $detalles = $docente->detalleDocentes()
+            ->with([
+                'detalleHorario.materia',
+                'detalleHorario.grupo',
+                'detalleHorario.aula',
+                'detalleHorario.horario',
+            ])->get();
+
+        // Filtrar por Detalle_Horario únicos (un mismo horario puede tener varias asistencias)
+        $unicosPorDetalleHorario = $detalles->unique(fn ($d) => optional($d->detalleHorario)->ID);
+
+        $result = $unicosPorDetalleHorario->map(function ($d) {
+            $dh = $d->detalleHorario;
+            return [
+                'detalle_horario_id' => $dh?->ID,
+                'materia' => $dh?->materia?->Nombre,
+                'grupo' => $dh?->grupo?->Nombre,
+                'aula' => $dh?->aula ? [
+                    'nro_facultad' => $dh->aula->Nro_Facultad,
+                    'nro_aula' => $dh->aula->Nro_Aula,
+                ] : null,
+                'hora_inicio' => $dh?->horario?->Hora_Inicio,
+                'hora_fin' => $dh?->horario?->Hora_Fin,
+            ];
+        })->values();
+
+        return response()->json([
+            'docente_id' => $docente->ID,
+            'docente_nombre' => $docente->Nombre,
+            'docente_apellido' => $docente->Apellido,
+            'horarios' => $result,
+        ]);
     }
 }

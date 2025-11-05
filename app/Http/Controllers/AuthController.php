@@ -17,7 +17,7 @@ class AuthController extends Controller
             'password' => 'required|string|min:6',
         ]);
 
-        // Buscar primero en User
+        // 1) Intentar login como admin (tabla users)
         $user = User::where('email', $credentials['email'])->first();
         if ($user && Hash::check($credentials['password'], $user->password)) {
             return response()->json([
@@ -26,12 +26,11 @@ class AuthController extends Controller
                     'name' => $user->name,
                     'email' => $user->email,
                     'role' => $user->role ?? 'admin',
-                    'type' => 'user',
                 ],
             ]);
         }
 
-        // Si no está en User, buscar en Docente (por correo y contraseña)
+        // 2) Intentar login como docente (tabla Docente), contraseña en texto plano
         $docente = Docente::where('Correo', $credentials['email'])->first();
         if ($docente && $docente->Contrasena === $credentials['password']) {
             return response()->json([
@@ -39,8 +38,8 @@ class AuthController extends Controller
                     'id' => $docente->ID,
                     'name' => $docente->Nombre . ' ' . $docente->Apellido,
                     'email' => $docente->Correo,
-                    'role' => 'docente',
-                    'type' => 'docente',
+                    'role' => 'teacher',
+                    'docenteId' => $docente->ID,
                 ],
             ]);
         }
