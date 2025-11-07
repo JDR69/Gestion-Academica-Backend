@@ -29,3 +29,8 @@ Route::post('login', [AuthController::class, 'login']);
 // Horarios por Docente
 Route::get('docente/{id}/horarios', [DocenteController::class, 'horarios']);
 Route::post('detalle-horario/marcar-asistencia', [App\Http\Controllers\DetalleHorarioController::class, 'marcarAsistencia']);
+
+// Consultar aulas disponibles para un horario
+Route::get('aulas/disponibles', [DetalleHorarioController::class, 'aulasDisponibles']);
+// Consultar horarios disponibles para un aula
+Route::get('horarios/disponibles', [DetalleHorarioController::class, 'horariosDisponibles']);

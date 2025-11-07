@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\DetalleHorario;
+use App\Models\Horarios;
+use App\Models\Aula;
 use Illuminate\Http\Request;
 
 class DetalleHorarioController extends Controller
@@ -20,6 +22,18 @@ class DetalleHorarioController extends Controller
             'Aula_ID' => 'required|integer|exists:Aula,ID',
             'Horario_ID' => 'required|integer|exists:Horarios,ID',
         ]);
+
+        // Validación: no permitir el mismo aula en el mismo horario
+        $existe = DetalleHorario::where('Aula_ID', $request->Aula_ID)
+            ->where('Horario_ID', $request->Horario_ID)
+            ->exists();
+
+        if ($existe) {
+            return response()->json([
+                'message' => 'El aula ya está asignada a ese horario.'
+            ], 422);
+        }
+
         $detalle = DetalleHorario::create($request->only(['Materia_ID', 'Grupo_ID', 'Aula_ID', 'Horario_ID']));
         return response()->json($detalle, 201);
     }
@@ -79,4 +93,35 @@ class DetalleHorarioController extends Controller
         $detalle->delete();
         return response()->json(null, 204);
     }
+
+    // Obtener aulas disponibles para un horario específico
+    public function aulasDisponibles(Request $request)
+    {
+        $request->validate([
+            'horario_id' => 'required|integer|exists:Horarios,ID',
+        ]);
+        
+        $aulasOcupadas = DetalleHorario::where('Horario_ID', $request->horario_id)
+            ->pluck('Aula_ID');
+        
+        $aulasDisponibles = Aula::whereNotIn('ID', $aulasOcupadas)->get();
+        
+        return response()->json($aulasDisponibles);
+    }
+
+    // Obtener horarios disponibles para un aula específica
+    public function horariosDisponibles(Request $request)
+    {
+        $request->validate([
+            'aula_id' => 'required|integer|exists:Aula,ID',
+        ]);
+        
+        $horariosOcupados = DetalleHorario::where('Aula_ID', $request->aula_id)
+            ->pluck('Horario_ID');
+        
+        $horariosDisponibles = Horarios::whereNotIn('ID', $horariosOcupados)->get();
+        
+        return response()->json($horariosDisponibles);
+    }
+
 }
